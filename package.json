@@ -8,6 +8,6 @@
   "scripts": {
     "start": "run-p api web",
     "api": "json-server db.json",
-    "web": "live-server"
+    "web": "live-server --ignore=./db.json ./"
   }
 }

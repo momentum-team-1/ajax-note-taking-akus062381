@@ -20,6 +20,7 @@ function renderNotes () {
     .then(response => response.json())
     .then(function (data) {
         let list = document.createElement("ul")
+        //this is the parent of the new list of notes:
         list.id = "item-list"
         for (let item of data) {
             let listItem = document.createElement("li")
@@ -32,11 +33,37 @@ function renderNotes () {
             let editIcon = document.createElement("span")
             editIcon.id = "edit"
             editIcon.classList.add("fa", "fa-edit")
+            let saveIcon = document.createElement("span")
+            saveIcon.id = "save"
+            saveIcon.classList.add("fa", "fa-save")
             listItem.appendChild(editIcon)
+            listItem.appendChild(saveIcon)
             list.appendChild(listItem)
             notesList.appendChild(list)
         }
     }) .then(() => editNotesItem)
+}
+
+function editNotesItem (itemId) {
+    let noteToEdit = document.querySelector(`li[data-id="${itemId}"]`)
+    let notesTextInput = document.querySelector("#notes-text")
+    let notesText = notesTextInput.value 
+    fetch(`http://localhost:3000/notes/${itemId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ item:notesText, done: false, created: moment().format() })
+    })
+    .then(response => response.json())
+    .then(function (edit) {
+        let newChildEl = document.createElement("input")
+        let list = document.querySelector("#item-list")
+        newChildEl.id = "edited-child"
+        newChildEl.innerText = ("")
+        list.appendChild(newChildEl)
+        // oldInputParent.appendChild(newChildEl)
+        // newChildEl.appendChild(newChildEl)
+        list.replaceChild(newChildEl, noteToEdit)
+    })
 }
 
 //write the fetch request to post data in its own function
@@ -60,15 +87,9 @@ notesList.addEventListener("click", function(event) {
     if (targetEl.matches("#edit")) {
         console.log("EDIT")
         editNotesItem(targetEl.parentElement.dataset.id)
-        let oldInputParent = document.querySelector("#item-list")
-        let newChildEl = document.createElement("input")
-        newChildEl.id = "edited-child"
-        newChildEl.innerText = ("")
-        // oldInputParent.appendChild(newChildEl)
-        // newChildEl.appendChild(newChildEl)
-        let noteToEdit = document.getElementById(`li[data-id="${itemId}"]`)
-        noteToEdit.replaceWith(newChildEl)
-    }else if (targetEl.matches("#delete")) {
+    } else if (targetEl.matches("#save")) {
+        console.log("SAVE")
+    } else if (targetEl.matches("#delete")) {
         console.log("DELETE")
         deleteNotesItem(targetEl.parentElement.dataset.id)
     }
@@ -84,25 +105,10 @@ function deleteNotesItem (itemId) {
     })
 }
 
-function editNotesItem (itemId) {
-    let noteToEdit = document.getElementById(`li[data-id="${itemId}"]`)
-    let notesTextInput = document.querySelector("#notes-text")
-    let notesText = notesTextInput.value 
-    fetch(`http://localhost:3000/notes/${itemId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ item:notesText, done: false, created: moment().format() })
-    })
-    // .then(() => newChild())
-}
-
 // function newChild (itemId) {
     // let oldInputParent = document.querySelector("#item-list")
-    // let newChildEl = document.createElement("input")
-    // newChildEl.id = "edited-child"
-    // newChildEl.innerText = ("")
-    // oldInputParent.appendChild(newChildEl)
-    // newChildEl.appendChild(newChildEl)
+    
+    
     // let noteToEdit = document.getElementById(`li[data-id="${itemId}"]`)
     // let listItem = document.createElement("li")
     // listItem.dataset.id = item.id

@@ -54,7 +54,7 @@ function editNotesItem (itemId) {
         body: JSON.stringify({ item:notesText, done: false, created: moment().format() })
     })
     .then(response => response.json())
-    .then(function (edit) {
+    .then(function () {
         let newChildEl = document.createElement("input")
         let list = document.querySelector("#item-list")
         newChildEl.id = "edited-child"
